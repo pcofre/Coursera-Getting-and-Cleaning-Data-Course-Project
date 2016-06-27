@@ -1,7 +1,6 @@
 library(reshape2)
-
 filename <- "getdata_dataset.zip"
-
+ 
 ## Download and unzip the dataset:
 if (!file.exists(filename)){
   fileURL <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
@@ -17,27 +16,27 @@ activityLabels[,2] <- as.character(activityLabels[,2])
 features <- read.table("UCI HAR Dataset/features.txt")
 features[,2] <- as.character(features[,2])
 
-# Extract only the data on mean and standard deviation
-featuresWanted <- grep(".*mean.*|.*std.*", features[,2])
-featuresWanted.names <- features[featuresWanted,2]
-featuresWanted.names = gsub('-mean', 'Mean', featuresWanted.names)
-featuresWanted.names = gsub('-std', 'Std', featuresWanted.names)
-featuresWanted.names <- gsub('[-()]', '', featuresWanted.names)
+# Extract only the data on mean and standard deviation (selected_features)
+selected_features <- grep(".*mean.*|.*std.*", features[,2])
+selected_features.names <- features[selected_features,2]
+selected_features.names = gsub('-mean', 'Mean', selected_features.names)
+selected_features.names = gsub('-std', 'Std', selected_features.names)
+selected_features.names <- gsub('[-()]', '', selected_features.names)
 
-# Load the datasets
-train <- read.table("UCI HAR Dataset/train/X_train.txt")[featuresWanted]
+# Load datasets
+train <- read.table("UCI HAR Dataset/train/X_train.txt")[selected_features]
 trainActivities <- read.table("UCI HAR Dataset/train/Y_train.txt")
 trainSubjects <- read.table("UCI HAR Dataset/train/subject_train.txt")
 train <- cbind(trainSubjects, trainActivities, train)
 
-test <- read.table("UCI HAR Dataset/test/X_test.txt")[featuresWanted]
+test <- read.table("UCI HAR Dataset/test/X_test.txt")[selected_features]
 testActivities <- read.table("UCI HAR Dataset/test/Y_test.txt")
 testSubjects <- read.table("UCI HAR Dataset/test/subject_test.txt")
 test <- cbind(testSubjects, testActivities, test)
 
 # merge datasets and add labels
 allData <- rbind(train, test)
-colnames(allData) <- c("subject", "activity", featuresWanted.names)
+colnames(allData) <- c("subject", "activity", selected_features.names)
 
 # turn activities & subjects into factors
 allData$activity <- factor(allData$activity, levels = activityLabels[,1], labels = activityLabels[,2])
